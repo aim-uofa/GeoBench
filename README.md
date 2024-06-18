@@ -36,7 +36,7 @@ Stay tuned, comming soon.
 ```
 @article{ge2024geobench,
     title={GeoBench: Benchmarking and Analyzing Monocular Geometry Estimation Models},
-    author={Ge, Yongtao and Xu, Guangkai, and Zhao Zhiyue and Sun, libo and Sun, Yanlong and Chen, Hao and Shen, Chunhua},
+    author={Ge, Yongtao and Xu, Guangkai, and Zhao, Zhiyue and Sun, libo and Sun, Yanlong and Chen, Hao and Shen, Chunhua},
     journal={arXiv preprint arXiv:2403.11111},
     year={2024}
 }
