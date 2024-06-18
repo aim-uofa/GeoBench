@@ -5,7 +5,7 @@
 
 </div>
 
-> This toolbox streamlines the use and evaluation for SOTA both discriminative and generative geometry estimation models, including:
+> This toolbox streamlines the use and evaluation for state-of-the-art discriminative and generative geometry estimation models, including:
 
 - [x] Genpercept
 - [x] DMP
