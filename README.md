@@ -1,7 +1,7 @@
 <div align="center">
 <img src="./assets/logo.png" width="128"/>
 
-# ⚡ GeoBench: Benchmarking and Analyzing <br> Geometry Estimation Models
+# ⚡ GeoBench: Benchmarking and Analyzing <br> Monocular Geometry Estimation Models
 
 🔰 [Project Page](https://yongtaoge.github.io/projects/geobench/), 📑 [Paper](https://arxiv.org/abs/2403.11111)
     
