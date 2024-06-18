@@ -5,7 +5,7 @@
 
 🔰 [Project Page](https://yongtaoge.github.io/projects/geobench/), 📑 [Paper](https://arxiv.org/abs/2403.11111)
     
-[Yongtao Ge]()<sup>1,</sup><sup>2</sup>, [Guangkai Xu]()<sup>1</sup>, [Zhiyue Zhao]()<sup>1</sup>, [Libo Sun]()<sup>2</sup>, [Zheng Huang]()<sup>3</sup>, [Yanlong Sun]()<sup>3</sup>, [Hao Chen]()<sup>1</sup>, [Chunhua Shen]()<sup>1</sup>
+[Yongtao Ge]()<sup>1,</sup><sup>2</sup>, [Guangkai Xu]()<sup>1</sup>, [Zhiyue Zhao]()<sup>1</sup>, [Libo Sun]()<sup>2</sup>, [Zheng Huang]()<sup>1</sup>, [Yanlong Sun]()<sup>3</sup>, [Hao Chen]()<sup>1</sup>, [Chunhua Shen]()<sup>1</sup>
 
 <sup>1</sup>[Zhejiang University](https://www.zju.edu.cn/english/), &nbsp;
 <sup>2</sup>[The University of Adelaide](https://www.adelaide.edu.au/aiml/), &nbsp;
