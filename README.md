@@ -25,10 +25,9 @@
 - [x] [Geowizard](https://arxiv.org/abs/2403.12013)
 - [x] [DepthFM](https://arxiv.org/abs/2403.13788)
 
-## Demo, Evaluation and Training
+## Inference Demo, Benchmarks and Training
 
 Stay tuned, comming soon.
-
 
 ## Citation
 
