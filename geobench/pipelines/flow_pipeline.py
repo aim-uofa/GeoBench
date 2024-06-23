@@ -34,8 +34,8 @@ from geobench.utils.image_util import chw2hwc, colorize_depth_maps, resize_max_r
 from geobench.utils.batchsize import find_batch_size
 from geobench.utils.depth_ensemble import ensemble_depths
 from geobench.utils.normal_ensemble import ensemble_normals
-from geobench.models.dsine import pad_input
-from geobench.models.image_projector import ImageProjModel
+# from geobench.models.dsine import pad_input
+# from geobench.models.image_projector import ImageProjModel
 
 from diffusers import logging
 logging.set_verbosity_error()
@@ -183,15 +183,12 @@ class FlowMatchPipeline(DiffusionPipeline):
         tokenizer: CLIPTokenizer,
         text_encoder: CLIPTextModel,
         decode_type: str = 'argmax', # rgb
-        # text_encoder: CLIPTextModel = None,
-        # segvae: SegAutoencoderKL = None,
         normal_head = None,
         seg_head = None,
         tokenizer_2: CLIPTokenizer = None,
         text_encoder_2: CLIPTextModel = None,
         text_embeds: torch.Tensor = None,
         image_encoder: CLIPVisionModelWithProjection = None,
-        image_projector: ImageProjModel = None,
         image_processor: AutoImageProcessor = None,
         controlnet: ControlNetModel = None,
         image_mean_std = [0.5, 0.5],
@@ -223,15 +220,13 @@ class FlowMatchPipeline(DiffusionPipeline):
         if self.sd_version == 'sdxl':
             text_embeds = torch.from_numpy(
                 np.load('geobench/utils/text_embeds_sdxl.npy', allow_pickle=True)
-            ) #.to(accelerator.device, weight_dtype)
+            )
 
         elif self.sd_version == 'sd21':
             text_embeds = torch.from_numpy(
                 np.load('geobench/utils/text_embeds_sd21.npy', allow_pickle=True)
-            ) #.to(accelerator.device, weight_dtype)
-
+            )
         self.empty_text_embed = text_embeds
-        # self.register_modules(empty_text_embed=text_embeds)
 
         if seg_head is not None:
             self.register_modules(seg_head=seg_head)
@@ -246,11 +241,6 @@ class FlowMatchPipeline(DiffusionPipeline):
             self.normal_head = normal_head
 
         self.decode_type = decode_type
-
-        # if segvae is not None:
-        #     self.register_modules(segvae=segvae)
-        # else:
-        #     self.segvae = segvae
 
         if isinstance(controlnet, ControlNetModel):
             self.register_modules(
@@ -268,19 +258,11 @@ class FlowMatchPipeline(DiffusionPipeline):
                 vae=vae,
                 scheduler=scheduler,
                 tokenizer=tokenizer,
-                image_projector=image_projector,
             )
 
-        # if text_encoder is not None:
-        #     self.register_modules(text_encoder=text_encoder)
-        # else:
-        self.register_modules(text_encoder=text_encoder)
-            # self.text_encoder = None
 
-        # if text_encoder_2 is not None:
+        self.register_modules(text_encoder=text_encoder)
         self.register_modules(text_encoder_2=text_encoder_2)
-        # else:
-        #     self.text_encoder_2 = None
 
         if tokenizer_2 is not None:
             self.register_modules(tokenizer_2=tokenizer_2)
@@ -291,7 +273,6 @@ class FlowMatchPipeline(DiffusionPipeline):
             self.register_modules(
                 image_encoder=image_encoder,
             )
-            # cls.config_name = "model_index_image_encoder.json"
         else:
             self.image_encoder = None
         
@@ -304,9 +285,6 @@ class FlowMatchPipeline(DiffusionPipeline):
                 )
         else:
             self.image_projector = None 
-
-        # self.vae_scale_factor = 2 ** (len(self.vae.config.block_out_channels) - 1)
-        # self.image_processor = VaeImageProcessor(vae_scale_factor=self.vae_scale_factor)
 
     # Copied from diffusers.pipelines.latent_consistency_models.pipeline_latent_consistency_text2img.LatentConsistencyModelPipeline.get_guidance_scale_embedding
     def get_guidance_scale_embedding(self, w, embedding_dim=512, dtype=torch.float32):
@@ -1115,68 +1093,3 @@ class FlowMatchPipeline(DiffusionPipeline):
             return normal
 
 
-class FlowMatchXLPipeline(FlowMatchPipeline):
-
-    rgb_latent_scale_factor = 0.13025
-    target_latent_scale_factor = 0.13025
-    seg_latent_scale_factor = 0.13025
-    normal_latent_scale_factor = 0.13025
-
-    config_name = "model_index.json"
-    sd_version = 'sdxl'
-
-    def __init__(
-        self,
-        # unet: UNet2DConditionModel,
-        # vae: AutoencoderKL,
-        # scheduler: DDIMScheduler,
-        # tokenizer: CLIPTokenizer,
-        # text_encoder: CLIPTextModel,
-        # tokenizer_2: CLIPTokenizer,
-        # text_encoder_2: CLIPTextModel,
-        # seg_head = None,
-        # text_embeds: torch.Tensor = None,
-        # image_encoder: CLIPVisionModelWithProjection = None,
-        # image_projector: ImageProjModel = None,
-        # controlnet: ControlNetModel = None,
-        unet: UNet2DConditionModel,
-        vae: AutoencoderKL,
-        scheduler: DDIMScheduler,
-        tokenizer: CLIPTokenizer,
-        text_encoder: CLIPTextModel,
-        decode_type: str = 'argmax', # rgb
-        # text_encoder: CLIPTextModel = None,
-        # segvae: SegAutoencoderKL = None,
-        normal_head = None,
-        seg_head = None,
-        tokenizer_2: CLIPTokenizer = None,
-        text_encoder_2: CLIPTextModel = None,
-        text_embeds: torch.Tensor = None,
-        image_encoder: CLIPVisionModelWithProjection = None,
-        image_projector: ImageProjModel = None,
-        controlnet: ControlNetModel = None,
-        image_mean_std = [0.5, 0.5],
-        gt_mean_std = [0., 1.],
-        noise_type = 'rgb',
-        noise_factor = 0.3,
-        use_cold_diffusion = False,
-        denoiser_type='unet',
-        use_vae_decoder_features = False,
-        enable_log_normalization = False
-    ):
-        super().__init__(
-            unet,
-            vae,
-            scheduler,
-            tokenizer,
-            text_encoder,
-            decode_type,
-            normal_head,
-            # seg_head,
-            # tokenizer_2,
-            # text_encoder_2,
-            # text_embeds,
-            # image_encoder,
-            # image_projector,
-            # controlnet,
-        )

@@ -31,8 +31,8 @@ from geobench.utils.image_util import (
 )
 from geobench.utils.batchsize import find_batch_size
 from geobench.utils.depth_ensemble import ensemble_depths
-from geobench.models.image_projector import ImageProjModel
-from geobench.models.mask2former_head import Mask2FormerHead
+# from geobench.models.image_projector import ImageProjModel
+# from geobench.models.mask2former_head import Mask2FormerHead
 from geobench.pipelines.flow_pipeline import q_sample
 
 from geobench.utils.seg_util import (
