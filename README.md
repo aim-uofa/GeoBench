@@ -48,4 +48,4 @@ Stay tuned, comming soon.
 ```
 ## License
 
-GeoBench is released under the [Apache 2.0Apache 2.0 license](LICENSE).
+GeoBench is released under the [Apache 2.0 license](LICENSE).
