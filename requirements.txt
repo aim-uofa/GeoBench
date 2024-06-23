@@ -1,0 +1,22 @@
+accelerate>=0.22.0
+diffusers>=0.25.0
+matplotlib
+scipy
+torch==2.0.1
+transformers>=4.32.1
+datasets>=2.15.0
+xformers==0.0.20
+peft>=0.7.0
+more_itertools
+evaluate
+lpips
+
+omegaconf
+pandas
+tabulate
+torchdiffeq>=0.2.4
+geffnet==1.0.2 # dsine
+html4vision
+#rembg # reconstruction
+pyvista
+cupy

@@ -25,6 +25,12 @@
 - [x] [Geowizard](https://arxiv.org/abs/2403.12013)
 - [x] [DepthFM](https://arxiv.org/abs/2403.13788)
 
+## Install
+```
+pip install -r requirements.txt
+pip install -e . -v
+```
+
 ## Inference Demo, Benchmarks and Training
 
 Stay tuned, comming soon.
@@ -33,7 +39,7 @@ Stay tuned, comming soon.
 
 ```
 @article{ge2024geobench,
-    title={Benchmarking and Analyzing Monocular Geometry Estimation Models},
+    title={GeoBench: Benchmarking and Analyzing Monocular Geometry Estimation Models},
     author={Ge, Yongtao and Xu, Guangkai, and Zhao, Zhiyue and Huang, zheng and Sun, libo and Sun, Yanlong and Chen, Hao and Shen, Chunhua},
     journal={arXiv preprint arXiv:2406.12671},
     year={2024}
@@ -42,4 +48,4 @@ Stay tuned, comming soon.
 ```
 ## License
 
-GeoBench is released under the [Apache 2.0](https://github.com/Lightning-AI/lightning-llama/blob/main/LICENSE) license.
+GeoBench is released under the [Apache 2.0Apache 2.0 license](LICENSE).
