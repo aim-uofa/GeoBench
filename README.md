@@ -16,7 +16,7 @@
 
 > This toolbox streamlines the use and evaluation for state-of-the-art discriminative and generative geometry estimation models, including:
 
-- [x] [DepthAnything](https://arxiv.org/abs/2401.10891)
+- [x] [Depth-Anything](https://arxiv.org/abs/2401.10891)
 - [x] [Metric3Dv2](https://arxiv.org/abs/2404.15506)
 - [x] [DSINE](https://arxiv.org/abs/2403.00712)
 - [x] [Marigold](https://arxiv.org/abs/2312.02145)
@@ -55,7 +55,7 @@ Stay tuned, comming soon.
 
 
 ## Citation
-Please cite our paper if you find the toolbox useful for your project:
+If you find the toolbox useful for your project, please cite our paper:
 ```
 @article{ge2024geobench,
     title={GeoBench: Benchmarking and Analyzing Monocular Geometry Estimation Models},

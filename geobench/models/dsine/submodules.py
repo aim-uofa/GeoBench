@@ -35,17 +35,13 @@ class Encoder(nn.Module):
     def forward(self, x):
         features = [x]
         for k, v in self.original_model._modules.items():
-            # print(k)
-            # if k=='bn2':
-                # import pdb;pdb.set_trace()
 
             if (k == 'blocks'):
                 for ki, vi in v._modules.items():
                     features.append(vi(features[-1]))
             else:
                 features.append(v(features[-1]))
-        
-        # import pdb;pdb.set_trace()
+
         return features
 
 
