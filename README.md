@@ -31,12 +31,31 @@ pip install -r requirements.txt
 pip install -e . -v
 ```
 
-## Inference Demo, Benchmarks and Training
+## Inference Demos
+```
+# inference marigold
+sh scripts/run_marigold.sh
+
+# inference metric3d
+sh scripts/run_metric3d.sh
+
+# inference Depth-Anything
+sh scripts/run_depthanything.sh
+
+# inference genpercept
+sh scripts/run_genpercept.sh
+
+# inference DSINE
+sh scripts/run_dsine.sh
+```
+
+## Benchmarks and Training
 
 Stay tuned, comming soon.
 
-## Citation
 
+## Citation
+Please cite our paper if you find the toolbox useful for your project:
 ```
 @article{ge2024geobench,
     title={GeoBench: Benchmarking and Analyzing Monocular Geometry Estimation Models},
