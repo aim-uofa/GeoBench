@@ -12,8 +12,8 @@ from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.models.unets.unet_2d_blocks import AutoencoderTinyBlock
 
 from geobench.utils.rotation import axis_angle_to_matrix
-from geobench.models.autoencoder_wrapper import NormalAutoencoderDecoderOutput
-from geobench.models.dsine.submodules import (
+# from geobench.models.autoencoder_wrapper import NormalAutoencoderDecoderOutput
+from geobench.archs.dsine.submodules import (
     Encoder, 
     ConvGRU, 
     UpSampleBN, 

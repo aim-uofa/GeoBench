@@ -52,6 +52,7 @@ class ConvBlock_double(nn.Module):
         out = self.nonlin_2(out)
         return out
     
+
 class DecoderFeature(nn.Module):
     def __init__(self, feat_channels, num_ch_dec=[64, 64, 128, 256]):
         super(DecoderFeature, self).__init__()
@@ -143,6 +144,7 @@ class UNet(nn.Module):
             x = features[i] + getattr(self, 'deconv_%d' % i)(x)
         x = self.prob(x)
         return x
+
 
 class ConvBnReLU(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, pad=1):

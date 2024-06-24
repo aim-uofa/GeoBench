@@ -5,8 +5,8 @@ import torch.nn.functional as F
 from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
 from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.models.modeling_utils import ModelMixin
-from geobench.models.metric3d.model.backbones.ViT_DINO import vit_large, vit_giant2
-from geobench.models.metric3d.model.backbones.ViT_DINO_reg import vit_large_reg, vit_giant2_reg
+from geobench.backbones.ViT_DINO import vit_large, vit_giant2
+from geobench.backbones.ViT_DINO_reg import vit_large_reg, vit_giant2_reg
 
 def _make_scratch(in_shape, out_shape, groups=1, expand=False):
     scratch = nn.Module()
