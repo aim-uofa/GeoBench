@@ -50,7 +50,6 @@ class LoRALinear(nn.Linear, LoRALayer):
             # Freezing the pre-trained weight matrix
             self.weight.requires_grad = False
 
-        # import pdb;pdb.set_trace()
         self.reset_parameters()
         # print(self.weight.min(), self.weight.max())
         if fan_in_fan_out:
@@ -121,25 +120,8 @@ class ConvLoRA(nn.Conv2d, LoRALayer):
             nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
             nn.init.zeros_(self.lora_B)
         else:
-            # import pdb;pdb.set_trace()
             nn.Conv2d.reset_parameters(self)
             # self.conv.reset_parameters()
-
-
-    # def train(self, mode=True):
-    #     super(ConvLoRA, self).train(mode)
-    #     if mode:
-    #         if self.merge_weights and self.merged:
-    #             if self.r > 0:
-    #                 # Make sure that the weights are not merged
-    #                 self.conv.weight.data -= (self.lora_B @ self.lora_A).view(self.conv.weight.shape) * self.scaling
-    #             self.merged = False
-    #     else:
-    #         if self.merge_weights and not self.merged:
-    #             if self.r > 0:
-    #                 # Merge the weights and mark it
-    #                 self.conv.weight.data += (self.lora_B @ self.lora_A).view(self.conv.weight.shape) * self.scaling
-    #             self.merged = True
 
     def forward(self, x):
         if self.r > 0 and not self.merged:
@@ -155,9 +137,9 @@ class ConvLoRA(nn.Conv2d, LoRALayer):
         else:
             return F.conv2d(x, self.weight, bias=self.bias, stride=self.stride, padding=self.padding, dilation=self.dilation, groups=self.groups) 
 
+
 class ConvTransposeLoRA(nn.ConvTranspose2d, LoRALayer):
     def __init__(self, in_channels, out_channels, kernel_size, r=0, lora_alpha=1, lora_dropout=0., merge_weights=True, **kwargs):
-        #self.conv = conv_module(in_channels, out_channels, kernel_size, **kwargs)
         nn.ConvTranspose2d.__init__(self, in_channels, out_channels, kernel_size, **kwargs)
         LoRALayer.__init__(self, r=r, lora_alpha=lora_alpha, lora_dropout=lora_dropout, merge_weights=merge_weights)
         assert isinstance(kernel_size, int)
@@ -213,9 +195,11 @@ class ConvTransposeLoRA(nn.ConvTranspose2d, LoRALayer):
                 groups=self.groups, dilation=self.dilation)
         #return self.conv(x)
 
+
 class Conv2dLoRA(ConvLoRA):
     def __init__(self, *args, **kwargs):
         super(Conv2dLoRA, self).__init__(*args, **kwargs)
+
 
 class ConvTranspose2dLoRA(ConvTransposeLoRA):
     def __init__(self, *args, **kwargs):
@@ -230,10 +214,6 @@ def compute_depth_expectation(prob, depth_values):
 def interpolate_float32(x, size=None, scale_factor=None, mode='nearest', align_corners=None):
     with torch.autocast(device_type='cuda', dtype=torch.bfloat16, enabled=False):
         return F.interpolate(x.float(), size=size, scale_factor=scale_factor, mode=mode, align_corners=align_corners)
-
-# def upflow8(flow, mode='bilinear'):
-#     new_size = (8 * flow.shape[2], 8 * flow.shape[3])
-#     return  8 * F.interpolate(flow, size=new_size, mode=mode, align_corners=True)
 
 def upflow4(flow, mode='bilinear'):
     new_size = (4 * flow.shape[2], 4 * flow.shape[3])
@@ -361,15 +341,19 @@ class ConvGRU(nn.Module):
         h = (1-z) * h + z * q
         return h
 
+
 def pool2x(x):
     return F.avg_pool2d(x, 3, stride=2, padding=1)
+
 
 def pool4x(x):
     return F.avg_pool2d(x, 5, stride=4, padding=1)
 
+
 def interp(x, dest):
     interp_args = {'mode': 'bilinear', 'align_corners': True}
     return interpolate_float32(x, dest.shape[2:], **interp_args)
+
 
 class BasicMultiUpdateBlock(nn.Module):
     def __init__(self, args, hidden_dims=[], out_dims=2, tuning_mode=None):
@@ -421,6 +405,7 @@ class BasicMultiUpdateBlock(nn.Module):
         mask = .25 * self.mask(net[0])
         return net, mask, delta_flow
 
+
 class LayerNorm2d(nn.LayerNorm):
     def __init__(self, dim):
         super(LayerNorm2d, self).__init__(dim)
@@ -430,6 +415,7 @@ class LayerNorm2d(nn.LayerNorm):
         x = super(LayerNorm2d, self).forward(x)
         x = x.permute(0, 3, 1, 2).contiguous()
         return x
+
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_planes, planes, norm_fn='group', stride=1, tuning_mode=None):
@@ -551,6 +537,7 @@ class ContextFeatureEncoder(nn.Module):
 
         return (outputs04, outputs08, outputs16)
 
+
 class ConvBlock(nn.Module):
     # reimplementation of DPT
     def __init__(self, channels, tuning_mode=None):
@@ -580,6 +567,7 @@ class ConvBlock(nn.Module):
         out = self.act(out)
         out = self.conv2(out)
         return x + out
+
 
 class FuseBlock(nn.Module):
     # reimplementation of DPT
@@ -616,6 +604,7 @@ class FuseBlock(nn.Module):
         out = self.out_conv(out)
         return out
 
+
 class Readout(nn.Module):  
     # From DPT
     def __init__(self, in_features, use_cls_token=True, num_register_tokens=0, tuning_mode=None):
@@ -638,6 +627,7 @@ class Readout(nn.Module):
             return self.act(features)
         else:
             return self.project(x)
+
 
 class Token2Feature(nn.Module):
     # From DPT
@@ -690,6 +680,7 @@ class Token2Feature(nn.Module):
         x = self.sample(x)
         return x
 
+
 class EncoderFeature(nn.Module):
     def __init__(self, vit_channel, num_ch_dec=[256, 512, 1024, 1024], use_cls_token=True, num_register_tokens=0, tuning_mode=None):
         super(EncoderFeature, self).__init__()
@@ -708,6 +699,7 @@ class EncoderFeature(nn.Module):
         x0 = self.read_0(ref_feature[0]) # 1/4
 
         return x, x2, x1, x0
+
 
 class DecoderFeature(nn.Module):
     def __init__(self, vit_channel, num_ch_dec=[128, 256, 512, 1024, 1024], use_cls_token=True, tuning_mode=None):
@@ -744,6 +736,7 @@ class DecoderFeature(nn.Module):
         x = self.upconv_1(x, x1) # 1/4
         # x = self.upconv_0(x, x0) # 4/7
         return x
+
 
 class RAFTDepthNormalDPT5(nn.Module):
     def __init__(self, cfg):
@@ -901,7 +894,6 @@ class RAFTDepthNormalDPT5(nn.Module):
         ## read vit token to multi-scale features
         B, H, W, _, _, num_register_tokens = vit_features[1]
         vit_features = vit_features[0]
-        # import pdb;pdb.set_trace()
         ## Error logging
         if torch.isnan(vit_features[0]).any():
             print('vit_feature_nan!!!')
@@ -1011,34 +1003,7 @@ class RAFTDepthNormalDPT5(nn.Module):
         return outputs
 
 
-if __name__ == "__main__":
-    try:
-        from mmcv.utils import Config
-    except:
-        from mmengine import Config
-    cfg = Config.fromfile('/cpfs01/shared/public/users/mu.hu/monodepth/mono/configs/RAFTDecoder/vit.raft.full2t.py')
-    cfg.model.decode_head.in_channels = [384, 384, 384, 384]
-    cfg.model.decode_head.feature_channels = [96, 192, 384, 768]
-    cfg.model.decode_head.decoder_channels = [48, 96, 192, 384, 384]
-    cfg.model.decode_head.hidden_channels = [48, 48, 48, 48, 48]
-    cfg.model.decode_head.up_scale = 7
-    
-    # cfg.model.decode_head.use_cls_token = True
-    # vit_feature = [[torch.rand((2, 20, 60, 384)).cuda(), torch.rand(2, 384).cuda()], \
-    #         [torch.rand((2, 20, 60, 384)).cuda(), torch.rand(2, 384).cuda()], \
-    #         [torch.rand((2, 20, 60, 384)).cuda(), torch.rand(2, 384).cuda()], \
-    #         [torch.rand((2, 20, 60, 384)).cuda(), torch.rand(2, 384).cuda()]]
-    
-    cfg.model.decode_head.use_cls_token = True
-    cfg.model.decode_head.num_register_tokens = 4
-    vit_feature = [[torch.rand((2, (74 * 74) + 5, 384)).cuda(),\
-                    torch.rand((2, (74 * 74) + 5, 384)).cuda(), \
-                    torch.rand((2, (74 * 74) + 5, 384)).cuda(), \
-                    torch.rand((2, (74 * 74) + 5, 384)).cuda()], (2, 74, 74, 1036, 1036, 4)]
 
-    decoder = RAFTDepthNormalDPT5(cfg).cuda()
-    output = decoder(vit_feature)
-    temp = 1
 
 
 

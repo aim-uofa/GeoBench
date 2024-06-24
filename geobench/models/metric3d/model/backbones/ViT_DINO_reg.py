@@ -89,7 +89,6 @@ class LoRALinear(nn.Linear, LoRALayer):
             self.scaling = self.lora_alpha / self.r
             # Freezing the pre-trained weight matrix
             self.weight.requires_grad = False
-        # import pdb;pdb.set_trace()
 
         self.reset_parameters()
         if fan_in_fan_out:
@@ -981,7 +980,7 @@ class DinoVisionTransformer(nn.Module):
     def forward_features(self, x, masks=None):
         if isinstance(x, list):
             return self.forward_features_list(x, masks)
-        # import pdb;pdb.set_trace()
+
         if len(x.size()) == 3:
             x = x[None]
 
@@ -1267,7 +1266,6 @@ def vit_large_reg(patch_size=14, num_register_tokens=4, checkpoint=None, tuning_
         tuning_mode=tuning_mode,
         **kwargs,
     )
-    # import pdb;pdb.set_trace()
     load_ckpt_dino(checkpoint, model)
 
     return model

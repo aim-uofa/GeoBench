@@ -107,7 +107,6 @@ class ConvNeXt(nn.Module):
     def forward(self, x):
         #x = self.forward_features(x)
         #x = self.head(x)
-        # import pdb;pdb.set_trace()
         if len(x.shape)==3:
             x = x[None]
         features = self.forward_features(x)

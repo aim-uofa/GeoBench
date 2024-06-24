@@ -8,7 +8,6 @@ class DensePredModel(nn.Module):
 
         self.encoder = get_func('geobench.metric3d.model.' + cfg.model.backbone.prefix + cfg.model.backbone.type)(**cfg.model.backbone)
         self.decoder = get_func('geobench.metric3d.model.' + cfg.model.decode_head.prefix + cfg.model.decode_head.type)(cfg)
-        # import pdb;pdb.set_trace()
 
     def forward(self, input, **kwargs):
         # [f_32, f_16, f_8, f_4]

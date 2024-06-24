@@ -233,7 +233,6 @@ def transform_test_data_scalecano(rgb, intrinsic, data_basic):
     label_scale_factor = cano_label_scale_ratio * resize_label_scale_ratio
 
     rgb = torch.from_numpy(rgb.transpose((2, 0, 1))).float()
-    # import pdb;pdb.set_trace()
     rgb = torch.div((rgb - mean), std)
     # rgb = rgb.cuda()
     

@@ -273,7 +273,7 @@ class DPTHead(nn.Module):
                 x = self.readout_projects[i](torch.cat((x, readout), -1))
             else:
                 x = x[0]
-            # import pdb;pdb.set_trace()
+
             x = x.permute(0, 2, 1).reshape((x.shape[0], x.shape[-1], patch_h, patch_w))
             
             x = self.projects[i](x)
@@ -297,9 +297,6 @@ class DPTHead(nn.Module):
 
         out = F.interpolate(out, (int(patch_h * 14), int(patch_w * 14)), mode="bilinear", align_corners=True)
         out = self.scratch.output_conv2(out)
-
-        # print(out.min())
-        # import pdb;pdb.set_trace()
 
         return out
         

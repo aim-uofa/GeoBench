@@ -216,7 +216,7 @@ class DSINE(ModelMixin, ConfigMixin):
         # pred_norm: bs, 3, 160, 120
         # feat_map: bs, 66, 160, 120
         # h: bs, 64, 160, 120
-        # import pdb;pdb.set_trace()
+
         pred_norm, feat_map, h = self.decoder(features, uvs=(uv_32, uv_16, uv_8))
         pred_norm = self.ray_relu(pred_norm, ray_8)
 
