@@ -49,7 +49,7 @@ sh scripts/run_genpercept.sh
 sh scripts/run_dsine.sh
 ```
 
-## Benchmarks and Training
+## Benchmarks and Model Zoo
 
 Stay tuned, comming soon.
 
