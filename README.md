@@ -1,7 +1,7 @@
 <div align="center">
 <img src="./assets/logo.png" width="128"/>
 
-# ⚡ GeoBench: Benchmarking and Analyzing <br> Monocular Geometry Estimation Models
+# ⚡ GeoBench: Benchmarking and Analyzing <br> Geometry Estimation Models
 
 🔰 [Project Page](https://yongtaoge.github.io/projects/geobench/), 📑 [Paper](https://arxiv.org/abs/2406.12671)
     
@@ -26,8 +26,8 @@
 - [x] [DepthFM](https://arxiv.org/abs/2403.13788)
 
 We would also support multi-view geometry models in near future:
-- [] [DUSt3R](https://arxiv.org/abs/2312.14132)
-- [] [MASt3R](https://arxiv.org/abs/2406.09756)
+- [ ] [DUSt3R](https://arxiv.org/abs/2312.14132)
+- [ ] [MASt3R](https://arxiv.org/abs/2406.09756)
 
 ## Install
 ```
