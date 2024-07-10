@@ -16,8 +16,10 @@
 
 > This toolbox streamlines the use and evaluation for state-of-the-art discriminative and generative geometry estimation models, including:
 
+- [x] [Metric3D-V2](https://arxiv.org/abs/2404.15506)
+- [x] [Depth-Anything-V2](https://arxiv.org/abs/2406.09414)
 - [x] [Depth-Anything](https://arxiv.org/abs/2401.10891)
-- [x] [Metric3Dv2](https://arxiv.org/abs/2404.15506)
+- [ ] [UniDepth](https://arxiv.org/abs/2403.18913)
 - [x] [DSINE](https://arxiv.org/abs/2403.00712)
 - [x] [Marigold](https://arxiv.org/abs/2312.02145)
 - [x] [DMP](https://arxiv.org/abs/2311.18832)
