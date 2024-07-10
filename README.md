@@ -1,7 +1,8 @@
 <div align="center">
 <img src="./assets/logo.png" width="128"/>
 
-# ⚡ GeoBench: Benchmarking and Analyzing <br> Geometry Estimation Models
+<!-- # ⚡ GeoBench: Benchmarking and Analyzing <br> Geometry Estimation Models -->
+# ⚡ GeoBench: 3D Geometry Estimation Made Easy
 
 🔰 [Project Page](https://yongtaoge.github.io/projects/geobench/), 📑 [Paper](https://arxiv.org/abs/2406.12671)
     
@@ -14,12 +15,12 @@
 
 </div>
 
-> This toolbox streamlines the use and evaluation for state-of-the-art discriminative and generative geometry estimation models, including:
+> This toolbox streamlines the use and evaluation for state-of-the-art discriminative and generative geometry estimation models, which can be served as foundation models for various downstream 3D reconstruction applications, including:
 
 - [x] [Metric3D-V2](https://arxiv.org/abs/2404.15506)
+- [ ] [UniDepth](https://arxiv.org/abs/2403.18913)
 - [ ] [Depth-Anything-V2](https://arxiv.org/abs/2406.09414)
 - [x] [Depth-Anything](https://arxiv.org/abs/2401.10891)
-- [ ] [UniDepth](https://arxiv.org/abs/2403.18913)
 - [x] [DSINE](https://arxiv.org/abs/2403.00712)
 - [x] [Marigold](https://arxiv.org/abs/2312.02145)
 - [x] [DMP](https://arxiv.org/abs/2311.18832)
@@ -27,9 +28,10 @@
 - [x] [Geowizard](https://arxiv.org/abs/2403.12013)
 - [x] [DepthFM](https://arxiv.org/abs/2403.13788)
 
-We would also support multi-view geometry models in near future:
+We would also support multi-view geometry models in the near future:
 - [ ] [DUSt3R](https://arxiv.org/abs/2312.14132)
 - [ ] [MASt3R](https://arxiv.org/abs/2406.09756)
+
 
 ## Install
 ```
