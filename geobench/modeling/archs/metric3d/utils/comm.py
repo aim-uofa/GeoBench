@@ -6,10 +6,10 @@ from collections import defaultdict, OrderedDict
 import os
 import socket
 from mmcv.utils import collect_env as collect_base_env
-try:
-    from mmcv.utils import get_git_hash
-except:
-    from mmengine.utils import get_git_hash
+# try:
+#     from mmcv.utils import get_git_hash
+# except:
+#     from mmengine.utils import get_git_hash
 #import geobench.metric3d.mmseg as mmseg
 # import mmseg
 import time

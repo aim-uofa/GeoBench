@@ -20,4 +20,3 @@ html4vision
 #rembg # reconstruction
 pyvista
 cupy
-mmcv-full==1.7.1 # for metric3d config

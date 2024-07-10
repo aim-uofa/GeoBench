@@ -25,6 +25,10 @@
 - [x] [Geowizard](https://arxiv.org/abs/2403.12013)
 - [x] [DepthFM](https://arxiv.org/abs/2403.13788)
 
+We would also support multi-view geometry models in near future:
+- [] [DUSt3R](https://arxiv.org/abs/2312.14132)
+- [] [MASt3R](https://arxiv.org/abs/2406.09756)
+
 ## Install
 ```
 pip install -r requirements.txt
@@ -33,16 +37,16 @@ pip install -e . -v
 
 ## Inference Demos
 ```
-# inference marigold
+# inference Marigold
 sh scripts/run_marigold.sh
 
-# inference metric3d
+# inference Metric3D
 sh scripts/run_metric3d.sh
 
 # inference Depth-Anything
 sh scripts/run_depthanything.sh
 
-# inference genpercept
+# inference GenPercept
 sh scripts/run_genpercept.sh
 
 # inference DSINE

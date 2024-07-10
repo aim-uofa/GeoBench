@@ -9,14 +9,14 @@ import numpy as np
 from glob import glob
 from PIL import Image
 from tqdm.auto import tqdm
-from mmcv.utils import Config, DictAction
 
-from geobench.models.metric3d.utils.do_test import transform_test_data_scalecano, get_prediction
-from geobench.models.metric3d.model.monodepth_model import get_configured_monodepth_model
-from geobench.models.metric3d.utils.running import load_ckpt
-from geobench.models.metric3d.utils.transform import gray_to_colormap
-from geobench.models.metric3d.utils.visualization import vis_surface_normal
+from geobench.modeling.metric3d.utils.do_test import transform_test_data_scalecano, get_prediction
+from geobench.modeling.metric3d.model.monodepth_model import get_configured_monodepth_model
+from geobench.modeling.metric3d.utils.running import load_ckpt
+from geobench.modeling.metric3d.utils.transform import gray_to_colormap
+from geobench.modeling.metric3d.utils.visualization import vis_surface_normal
 from geobench.utils.image_util import chw2hwc, colorize_depth_maps
+from geobench.utils.mmcv_config import Config, DictAction
 
 EXTENSION_LIST = [".jpg", ".jpeg", ".png"]
 
