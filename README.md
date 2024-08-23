@@ -63,7 +63,8 @@ Stay tuned, comming soon.
 
 ## License
 For non-commercial academic use, this project is licensed under [the 2-clause BSD License](https://opensource.org/license/bsd-2-clause). 
-For commercial use, please contact [Chunhua Shen](chhshen@gmail.com).
+For commercial use, please contact [Chunhua Shen](mailto:chhshen@gmail.com).
+Note that any third-party software/library involved in this project is licensed under its own license. 
 
 
 
@@ -78,6 +79,3 @@ If you find the toolbox useful for your project, please cite our paper:
 }
 
 ```
-## License
-
-GeoBench is released under the [Apache 2.0 license](LICENSE).
