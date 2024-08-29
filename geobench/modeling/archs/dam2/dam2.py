@@ -5,8 +5,169 @@ import torch.nn.functional as F
 from huggingface_hub import PyTorchModelHubMixin, hf_hub_download
 from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.models.modeling_utils import ModelMixin
-from geobench.backbones.ViT_DINO import vit_large, vit_giant2
-from geobench.backbones.ViT_DINO_reg import vit_large_reg, vit_giant2_reg
+from geobench.modeling.backbones.vit.ViT_DINO import vit_large, vit_giant2
+from geobench.modeling.backbones.vit.ViT_DINO_reg import vit_large_reg, vit_giant2_reg
+from geobench.modeling.backbones.vit.dinov2 import DINOv2
+from torchvision.transforms import Compose
+
+import numpy as np
+import cv2
+
+class PrepareForNet(object):
+    """Prepare sample for usage as network input.
+    """
+
+    def __init__(self):
+        pass
+
+    def __call__(self, sample):
+        image = np.transpose(sample["image"], (2, 0, 1))
+        sample["image"] = np.ascontiguousarray(image).astype(np.float32)
+
+        if "depth" in sample:
+            depth = sample["depth"].astype(np.float32)
+            sample["depth"] = np.ascontiguousarray(depth)
+        
+        if "mask" in sample:
+            sample["mask"] = sample["mask"].astype(np.float32)
+            sample["mask"] = np.ascontiguousarray(sample["mask"])
+        
+        return sample
+
+
+class Resize(object):
+    """Resize sample to given size (width, height).
+    """
+
+    def __init__(
+        self,
+        width,
+        height,
+        resize_target=True,
+        keep_aspect_ratio=False,
+        ensure_multiple_of=1,
+        resize_method="lower_bound",
+        image_interpolation_method=cv2.INTER_AREA,
+    ):
+        """Init.
+
+        Args:
+            width (int): desired output width
+            height (int): desired output height
+            resize_target (bool, optional):
+                True: Resize the full sample (image, mask, target).
+                False: Resize image only.
+                Defaults to True.
+            keep_aspect_ratio (bool, optional):
+                True: Keep the aspect ratio of the input sample.
+                Output sample might not have the given width and height, and
+                resize behaviour depends on the parameter 'resize_method'.
+                Defaults to False.
+            ensure_multiple_of (int, optional):
+                Output width and height is constrained to be multiple of this parameter.
+                Defaults to 1.
+            resize_method (str, optional):
+                "lower_bound": Output will be at least as large as the given size.
+                "upper_bound": Output will be at max as large as the given size. (Output size might be smaller than given size.)
+                "minimal": Scale as least as possible.  (Output size might be smaller than given size.)
+                Defaults to "lower_bound".
+        """
+        self.__width = width
+        self.__height = height
+
+        self.__resize_target = resize_target
+        self.__keep_aspect_ratio = keep_aspect_ratio
+        self.__multiple_of = ensure_multiple_of
+        self.__resize_method = resize_method
+        self.__image_interpolation_method = image_interpolation_method
+
+    def constrain_to_multiple_of(self, x, min_val=0, max_val=None):
+        y = (np.round(x / self.__multiple_of) * self.__multiple_of).astype(int)
+
+        if max_val is not None and y > max_val:
+            y = (np.floor(x / self.__multiple_of) * self.__multiple_of).astype(int)
+
+        if y < min_val:
+            y = (np.ceil(x / self.__multiple_of) * self.__multiple_of).astype(int)
+
+        return y
+
+    def get_size(self, width, height):
+        # determine new height and width
+        scale_height = self.__height / height
+        scale_width = self.__width / width
+
+        if self.__keep_aspect_ratio:
+            if self.__resize_method == "lower_bound":
+                # scale such that output size is lower bound
+                if scale_width > scale_height:
+                    # fit width
+                    scale_height = scale_width
+                else:
+                    # fit height
+                    scale_width = scale_height
+            elif self.__resize_method == "upper_bound":
+                # scale such that output size is upper bound
+                if scale_width < scale_height:
+                    # fit width
+                    scale_height = scale_width
+                else:
+                    # fit height
+                    scale_width = scale_height
+            elif self.__resize_method == "minimal":
+                # scale as least as possbile
+                if abs(1 - scale_width) < abs(1 - scale_height):
+                    # fit width
+                    scale_height = scale_width
+                else:
+                    # fit height
+                    scale_width = scale_height
+            else:
+                raise ValueError(f"resize_method {self.__resize_method} not implemented")
+
+        if self.__resize_method == "lower_bound":
+            new_height = self.constrain_to_multiple_of(scale_height * height, min_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width, min_val=self.__width)
+        elif self.__resize_method == "upper_bound":
+            new_height = self.constrain_to_multiple_of(scale_height * height, max_val=self.__height)
+            new_width = self.constrain_to_multiple_of(scale_width * width, max_val=self.__width)
+        elif self.__resize_method == "minimal":
+            new_height = self.constrain_to_multiple_of(scale_height * height)
+            new_width = self.constrain_to_multiple_of(scale_width * width)
+        else:
+            raise ValueError(f"resize_method {self.__resize_method} not implemented")
+
+        return (new_width, new_height)
+
+    def __call__(self, sample):
+        width, height = self.get_size(sample["image"].shape[1], sample["image"].shape[0])
+        
+        # resize sample
+        sample["image"] = cv2.resize(sample["image"], (width, height), interpolation=self.__image_interpolation_method)
+
+        if self.__resize_target:
+            if "depth" in sample:
+                sample["depth"] = cv2.resize(sample["depth"], (width, height), interpolation=cv2.INTER_NEAREST)
+                
+            if "mask" in sample:
+                sample["mask"] = cv2.resize(sample["mask"].astype(np.float32), (width, height), interpolation=cv2.INTER_NEAREST)
+        
+        return sample
+
+
+class NormalizeImage(object):
+    """Normlize image by given mean and std.
+    """
+
+    def __init__(self, mean, std):
+        self.__mean = mean
+        self.__std = std
+
+    def __call__(self, sample):
+        sample["image"] = (sample["image"] - self.__mean) / self.__std
+
+        return sample
+
 
 def _make_scratch(in_shape, out_shape, groups=1, expand=False):
     scratch = nn.Module()
@@ -39,18 +200,6 @@ def _make_scratch(in_shape, out_shape, groups=1, expand=False):
         )
 
     return scratch
-
-
-def _make_fusion_block(features, use_bn, size = None):
-    return FeatureFusionBlock(
-        features,
-        nn.ReLU(False),
-        deconv=False,
-        bn=use_bn,
-        expand=False,
-        align_corners=True,
-        size=size,
-    )
 
 
 class ResidualConvUnit(nn.Module):
@@ -172,6 +321,18 @@ class FeatureFusionBlock(nn.Module):
         return output
 
 
+def _make_fusion_block(features, use_bn, size = None):
+    return FeatureFusionBlock(
+        features,
+        nn.ReLU(False),
+        deconv=False,
+        bn=use_bn,
+        expand=False,
+        align_corners=True,
+        size=size,
+    )
+
+
 class DPTHead(nn.Module):
     def __init__(self, mode, in_channels, features=256, use_bn=False, out_channels=[256, 512, 1024, 1024], use_clstoken=False):
         super(DPTHead, self).__init__()
@@ -245,14 +406,14 @@ class DPTHead(nn.Module):
 
         self.scratch.output_conv1 = nn.Conv2d(head_features_1, head_features_1 // 2, kernel_size=3, stride=1, padding=1)
         
-        if mode == 'metric':
+        if 'metric' in mode:
             self.scratch.output_conv2 = nn.Sequential(
                 nn.Conv2d(head_features_1 // 2, head_features_2, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(True),
                 nn.Conv2d(head_features_2, 1, kernel_size=1, stride=1, padding=0),
                 nn.Sigmoid()
             )
-        elif mode == 'disparity':
+        elif 'disparity' in mode or 'rel_depth' in mode:
             self.scratch.output_conv2 = nn.Sequential(
                 nn.Conv2d(head_features_1 // 2, head_features_2, kernel_size=3, stride=1, padding=1),
                 nn.ReLU(True),
@@ -273,7 +434,7 @@ class DPTHead(nn.Module):
                 x = self.readout_projects[i](torch.cat((x, readout), -1))
             else:
                 x = x[0]
-
+            # import pdb;pdb.set_trace()
             x = x.permute(0, 2, 1).reshape((x.shape[0], x.shape[-1], patch_h, patch_w))
             
             x = self.projects[i](x)
@@ -298,11 +459,14 @@ class DPTHead(nn.Module):
         out = F.interpolate(out, (int(patch_h * 14), int(patch_w * 14)), mode="bilinear", align_corners=True)
         out = self.scratch.output_conv2(out)
 
+        # print(out.min())
+        # import pdb;pdb.set_trace()
+
         return out
         
         
-class DepthAnything(ModelMixin, ConfigMixin):
-    @register_to_config
+# class DepthAnythingV2(ModelMixin, ConfigMixin):
+class DepthAnythingV2(nn.Module, PyTorchModelHubMixin):
     def __init__(
         self, 
         encoder='vitl', 
@@ -310,11 +474,13 @@ class DepthAnything(ModelMixin, ConfigMixin):
         out_channels=[256, 512, 1024, 1024], 
         use_bn=False, 
         use_clstoken=False, 
+        # localhub=None
         use_registers=False,
         max_depth=1.0,
-        mode='disparity'
+        mode='disparity',
+        pretrain_type='dinov2',
     ):
-        super(DepthAnything, self).__init__()
+        super(DepthAnythingV2, self).__init__()
         
         self.max_depth = max_depth
         self.mode = mode
@@ -327,42 +493,63 @@ class DepthAnything(ModelMixin, ConfigMixin):
             'vitl': [4, 11, 17, 23], 
             'vitg': [9, 19, 29, 39]
         }
-
-        if use_registers:
-            if encoder == 'vitl':
-                checkpoint='data/weights/dinov2/dinov2_vitl14_reg4_pretrain.pth'
-                self.backbone = vit_large_reg(checkpoint=checkpoint)
-            elif encoder == 'vitg':
-                checkpoint='data/weights/dinov2/dinov2_vitg14_reg4_pretrain.pth'
-                self.backbone = vit_giant2_reg(checkpoint=checkpoint)
-            else:
-                raise NotImplementedError
-        else:
-            if encoder == 'vitl':
-                checkpoint='data/weights/dinov2/dinov2_vitl14_pretrain.pth'
-                self.backbone = vit_large(checkpoint=checkpoint)
-            elif encoder == 'vitg':
-                checkpoint='data/weights/dinov2/dinov2_vitg14_pretrain.pth'
-                self.backbone = vit_giant2(checkpoint=checkpoint)
-            else:
-                raise NotImplementedError
-
-        dim = self.backbone.embed_dim  
-        self.depth_head = DPTHead(mode, dim, features, use_bn, out_channels=out_channels, use_clstoken=use_clstoken)
+        self.encoder = encoder
+        self.pretrained = DINOv2(model_name=encoder)
+        dim = self.pretrained.embed_dim
         
-    
-    def forward(self, x):
+        self.depth_head = DPTHead(mode, dim, features, use_bn, out_channels=out_channels, use_clstoken=use_clstoken)
 
+    @torch.no_grad()
+    def infer_image(self, raw_image, device, input_size=518):
+        # infer image
+        image, (h, w) = self.image2tensor(raw_image, input_size, device)
+        depth = self.forward(image)
+        depth = F.interpolate(depth[:, None], (h, w), mode="bilinear", align_corners=True)[0, 0]
+        
+        return depth.cpu().numpy()
+    
+    def image2tensor(self, raw_image, input_size=518, device=None):        
+        transform = Compose([
+            Resize(
+                width=input_size,
+                height=input_size,
+                resize_target=False,
+                keep_aspect_ratio=True,
+                ensure_multiple_of=14,
+                resize_method='lower_bound',
+                image_interpolation_method=cv2.INTER_CUBIC,
+            ),
+            NormalizeImage(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            PrepareForNet(),
+        ])
+        
+        h, w = raw_image.shape[:2]
+        
+        image = cv2.cvtColor(raw_image, cv2.COLOR_BGR2RGB) / 255.0
+        
+        image = transform({'image': image})['image']
+        image = torch.from_numpy(image).unsqueeze(0)
+        
+        # DEVICE = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
+        if device is not None:
+            image = image.to(device)
+        
+        return image, (h, w)
+
+
+    def forward(self, x):
         h, w = x.shape[-2:]
-        features = self.backbone.get_intermediate_layers(x, self.intermediate_layer_idx[self.encoder], return_class_token=True)
+        # features = self.backbone.get_intermediate_layers(x, 4, return_class_token=True)
+        features = self.pretrained.get_intermediate_layers(x, self.intermediate_layer_idx[self.encoder], return_class_token=True)
         patch_h, patch_w = h // 14, w // 14
         depth = self.depth_head(features, patch_h, patch_w)
         depth = F.interpolate(depth, size=(h, w), mode="bilinear", align_corners=True)
+        # import pdb;pdb.set_trace()
         
-        if self.mode == 'metric':
+        if 'metric' in self.mode:
             depth = depth * self.max_depth
-        elif self.mode == 'disparity':
-            depth = F.relu(depth)
+        elif 'disparity' in self.mode or 'rel_depth' in self.mode:
+            depth = F.relu(depth).squeeze(1)
         else:
             raise NotImplementedError
 
@@ -379,8 +566,14 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     
+    # model = DepthAnything.from_pretrained("LiheYoung/depth_anything_{:}14".format(args.encoder))
+    # model = DepthAnything.from_pretrained("LiheYoung/depth_anything_{:}14".format(args.encoder))
+    # print(model)
     device = 'cuda'
     image = torch.randn(1,3, 420, 420).to(device)
-    model = DepthAnything(localhub=local_hub,).to(device)
+    local_hub = "~/.cache/torch/hub/facebookresearch_dinov2_main/"
+    model = DepthAnythingV2(localhub=local_hub,).to(device)
     output = model(image)
+    import pdb;pdb.set_trace()
+    # .from_pretrained("LiheYoung/depth_anything_{:}14".format(args.encoder))
     print(model)

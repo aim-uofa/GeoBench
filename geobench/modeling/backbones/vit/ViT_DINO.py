@@ -145,7 +145,7 @@ class PatchEmbed(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         _, _, H, W = x.shape
         patch_H, patch_W = self.patch_size
-
+        # import pdb;pdb.set_trace()
         assert H % patch_H == 0, f"Input image height {H} is not a multiple of patch height {patch_H}"
         assert W % patch_W == 0, f"Input image width {W} is not a multiple of patch width: {patch_W}"
 
@@ -873,6 +873,7 @@ class PosConv(nn.Module):
     #def no_weight_decay(self):
         #return ['proj.%d.weight' % i for i in range(4)]
 
+
 class DinoWindowVisionTransformer(nn.Module):
     def __init__(
         self,
@@ -1392,19 +1393,42 @@ def vit_large(patch_size=14, checkpoint=None, **kwargs):
     return model
 
 
-def vit_giant2(patch_size=16, **kwargs):
+def vit_giant2(patch_size=14, checkpoint=None, **kwargs):
     """
     Close to ViT-giant, with embed-dim 1536 and 24 heads => embed-dim per head 64
     """
     model = DinoVisionTransformer(
+        img_size = 518,
         patch_size=patch_size,
         embed_dim=1536,
         depth=40,
         num_heads=24,
         mlp_ratio=4,
-        block_fn=partial(Block, attn_class=MemEffAttention),
+        # block_fn=partial(Block, attn_class=MemEffAttention),
+        block_fn=partial(NestedTensorBlock, attn_class=MemEffAttention),
         **kwargs,
     )
+
+    if checkpoint is not None:
+        with open(checkpoint, "rb") as f:
+            state_dict = torch.load(f)
+        
+        try:
+            model.load_state_dict(state_dict, strict=True)
+        except:
+            new_state_dict = {}
+            for key, value in state_dict.items():
+                if 'blocks' in key:
+                    key_new = 'blocks.0' + key[len('blocks'):]
+                else:
+                    key_new = key
+                new_state_dict[key_new] = value
+
+            import pdb;pdb.set_trace()
+            model.load_state_dict(new_state_dict, strict=True)
+        #del model.norm
+        del model.mask_token
+
     return model
 
 

@@ -19,7 +19,7 @@
 
 - [x] [Metric3D-V2](https://arxiv.org/abs/2404.15506)
 - [ ] [UniDepth](https://arxiv.org/abs/2403.18913)
-- [ ] [Depth-Anything-V2](https://arxiv.org/abs/2406.09414)
+- [x] [Depth-Anything-V2](https://arxiv.org/abs/2406.09414)
 - [x] [Depth-Anything](https://arxiv.org/abs/2401.10891)
 - [x] [DSINE](https://arxiv.org/abs/2403.00712)
 - [x] [Marigold](https://arxiv.org/abs/2312.02145)
@@ -27,10 +27,6 @@
 - [x] [Genpercept](https://arxiv.org/abs/2403.06090)
 - [x] [Geowizard](https://arxiv.org/abs/2403.12013)
 - [x] [DepthFM](https://arxiv.org/abs/2403.13788)
-
-We would also support multi-view geometry models in the near future:
-- [ ] [DUSt3R](https://arxiv.org/abs/2312.14132)
-- [ ] [MASt3R](https://arxiv.org/abs/2406.09756)
 
 
 ## Install

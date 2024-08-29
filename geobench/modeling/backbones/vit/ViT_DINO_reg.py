@@ -89,6 +89,7 @@ class LoRALinear(nn.Linear, LoRALayer):
             self.scaling = self.lora_alpha / self.r
             # Freezing the pre-trained weight matrix
             self.weight.requires_grad = False
+        # import pdb;pdb.set_trace()
 
         self.reset_parameters()
         if fan_in_fan_out:
@@ -130,8 +131,6 @@ class LoRALinear(nn.Linear, LoRALayer):
             return result
         else:
             return F.linear(x, T(self.weight), bias=self.bias)
-
-
 
 def make_2tuple(x):
     if isinstance(x, tuple):
@@ -175,7 +174,6 @@ class LayerScale(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return x.mul_(self.gamma) if self.inplace else x * self.gamma
-
 
 class PatchEmbed(nn.Module):
     """
@@ -299,7 +297,6 @@ class Mlp(nn.Module):
         x = self.drop(x)
         return x
 
-
 class SwiGLUFFN(nn.Module):
     def __init__(
         self,
@@ -342,7 +339,6 @@ class SwiGLUFFN(nn.Module):
             out = ssf_ada(out, self.ssf_scale_2, self.ssf_scale_2)
 
         return out
-
 
 try:
     from xformers.ops import SwiGLU
@@ -980,7 +976,7 @@ class DinoVisionTransformer(nn.Module):
     def forward_features(self, x, masks=None):
         if isinstance(x, list):
             return self.forward_features_list(x, masks)
-
+        # import pdb;pdb.set_trace()
         if len(x.size()) == 3:
             x = x[None]
 
@@ -1121,8 +1117,10 @@ def load_ckpt_dino(checkpoint, model):
             del model.mask_token
             return
 
+        # import pdb;pdb.set_trace()
         try:
             model.load_state_dict(state_dict, strict=True)
+            print('load dinov2 pretrain weights successfully ')
         except:
             new_state_dict = {}
             for key, value in state_dict.items():
@@ -1133,6 +1131,7 @@ def load_ckpt_dino(checkpoint, model):
                 new_state_dict[key_new] = value
 
             model.load_state_dict(new_state_dict, strict=True)
+            print('load dinov2 pretrain weights successfully')
         del model.mask_token
         return
     else:
